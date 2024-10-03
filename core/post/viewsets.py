@@ -8,7 +8,7 @@ from core.post.serializers import PostSerializer
 
 class PostViewSet(AbstractViewSet):
     
-    http_method_names = ('post', 'get')
+    http_method_names = ('post', 'get', 'put', 'delete')
     permission_classes = (IsAuthenticated,)
     serializer_class = PostSerializer
     
@@ -25,3 +25,14 @@ class PostViewSet(AbstractViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()  # Get the post instance to update
+        serializer = self.get_serializer(instance, data=request.data, partial=False)  # Partial=False for a full update
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def perform_update(self, serializer):
+        instance = serializer.save(edited=True)
+    
